@@ -1,0 +1,42 @@
+<html>
+<head>
+<script language="Javascript">
+	function loadFormSMS() {
+		document.formSMS.packSMS.value = localStorage["packSMS"];
+		document.formSMS.soapLogin.value = localStorage["soapLogin"];
+		document.formSMS.soapPassword.value = localStorage["soapPassword"];
+		document.formSMS.fromNumber.value = localStorage["fromNumber"];
+	}
+
+	function sendSMS() {
+		var xhr = new XMLHttpRequest();
+		var params = "packSMS=" + encodeURI(localStorage["packSMS"]) + "&soapLogin=" + encodeURI(localStorage["soapLogin"]) + "&soapPassword=" + encodeURI(localStorage["soapPassword"]) + "&message=" + encodeURI(document.formSMS.message.value) + "&fromNumber=" + encodeURI(localStorage["fromNumber"]) + "&toNumber=" + encodeURI(document.formSMS.toNumber.value);
+		xhr.open("POST", "https://sms.px.io/sms.php", true);
+		xhr.onreadystatechange = function() {
+			if (xhr.readyState == 4) {
+				var notification = webkitNotifications.createNotification(
+  					'icon.png',  
+  					"Information sur l'envoie de votre SMS",  
+  					xhr.responseText 
+				);
+				notification.show();
+  			}
+		}
+		xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+		xhr.send(params);
+	}
+
+</script>
+</head>
+<body onload="loadFormSMS()">
+	<form name="formSMS">
+		<input type="hidden" name="numero">
+		<input type="hidden" name="message">
+		<input type="hidden" name="packSMS">
+		<input type="hidden" name="soapLogin">
+		<input type="hidden" name="soapPassword">
+		<input type="hidden" name="fromNumber">
+		<input type="hidden" name="toNumber">
+	</form>
+</body>
+</html>

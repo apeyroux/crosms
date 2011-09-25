@@ -1,0 +1,67 @@
+<html>
+<head>
+<STYLE type="text/css">
+input {
+ border:1px solid black;
+ background-color:#FFFF99;
+ }
+textarea {
+ border:1px solid black;
+ background-color:#FFFF99;
+ }
+</STYLE>
+<script language="Javascript">
+
+	function loadForm() {
+		if("" == localStorage["packSMS"] || null == localStorage["packSMS"]) {
+			document.getElementById("toNumber").style.backgroundColor = "#ccc";
+			document.getElementById("toNumber").setAttribute('readonly', 'readonly');
+			document.getElementById("message").style.backgroundColor = "#ccc";
+			document.getElementById("message").setAttribute('readonly', 'readonly');
+			document.getElementById("message").value = "Merci de configurer l'application.";
+		}
+		init_contact();
+	}
+
+	function sendSMS() {
+		bg = chrome.extension.getBackgroundPage();
+		if(document.getElementById("toNumber").value != ""){
+			bg.document.formSMS.toNumber.value = document.getElementById("toNumber").value;
+		}else{
+			bg.document.formSMS.toNumber.value = document.getElementById("contacts").options[document.getElementById("contacts").selectedIndex].value
+		}
+		bg.document.formSMS.message.value = document.getElementById("message").value;
+		bg.sendSMS();
+		window.close();
+	}
+
+	function init_contact() {
+		var db = null;
+		db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
+		db.transaction(function (tx) {
+  			tx.executeSql('CREATE TABLE IF NOT EXISTS contacts (id REAL UNIQUE, name TEXT, number TEXT)');
+			tx.executeSql('SELECT id, name, number FROM contacts', [], function (tx, data) {
+        			for(var i = 0; i < data.rows.length; i++){ 
+					document.getElementById('contacts').add(new Option(data.rows.item(i).name, data.rows.item(i).number));
+        			}
+    			});
+		});
+	}
+</script>
+</head>
+<body onload="loadForm()">
+	<div id="form">
+	<div style="font-family:verdana,times,sans-serif;font-size:10px;">
+	<table style="font-family:verdana,times,sans-serif;font-size:10px;">
+	<tr><td>Dest.</td><td><input type="text" id="toNumber" style="color:blue;" size=25/></td></tr>
+	<tr><td>ou</td><td><select id="contacts"></select></td></tr>
+	</table>
+	</div>
+	<textarea id="message" cols=30 rows=8></textarea>
+	<br/><br/>
+	<center>
+	<div onclick="javascript:sendSMS()" style="color:#fff;font-size:1Opx;font-weight:bold;padding:5px;background-color:red;border:1px solid #000;font-family:verdana,times,sans-serif;width:100px"><center>Envoyer</center><div>
+	</center>
+	</div>
+</body>
+</html>

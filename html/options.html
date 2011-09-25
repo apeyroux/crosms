@@ -1,0 +1,159 @@
+<html>
+
+<head><title>CroSMS Options</title></head>
+<script language="javascript" src="Math.uuid.js"></script>
+<script type="text/javascript">
+
+function save_options() {
+
+  var entryPackSMS = document.getElementById("packSMS");
+  var packSMS = entryPackSMS.value;
+  localStorage["packSMS"] = packSMS;
+
+  var entrySoapLogin = document.getElementById("soapLogin");
+  var soapLogin = entrySoapLogin.value;
+  localStorage["soapLogin"] = soapLogin;
+
+  var entrySoapPassword = document.getElementById("soapPassword");
+  var soapPassword = entrySoapPassword.value;
+  localStorage["soapPassword"] = soapPassword;
+
+  var entryFromNumber = document.getElementById("fromNumber");
+  var fromNumber = entryFromNumber.value;
+  localStorage["fromNumber"] = fromNumber;
+
+  // Update status to let user know options were saved.
+  var status = document.getElementById("status");
+  status.innerHTML = "Options Saved.";
+  setTimeout(function() {
+    status.innerHTML = "";
+  }, 750);
+}
+
+function restore_options() {
+
+	var packSMS = localStorage["packSMS"];
+	var entryPackSMS = document.getElementById("packSMS");
+	if(packSMS){
+		entryPackSMS.value = packSMS;
+	}else{
+		entryPackSMS.value = "";
+	}
+
+	var soapLogin = localStorage["soapLogin"];
+	var entrySoapLogin = document.getElementById("soapLogin");
+	if(soapLogin) {
+		entrySoapLogin.value = soapLogin;
+	}else{
+		entrySoapLogin.value = "";
+	}
+
+	var soapPassword = localStorage["soapPassword"];
+	var entrySoapPassword = document.getElementById("soapPassword");
+	if(soapPassword) {
+		entrySoapPassword.value = soapPassword;
+	}else{
+		entrySoapPassword.value = "";
+	}
+
+	var fromNumber = localStorage["fromNumber"];
+	var entryFromNumber = document.getElementById("fromNumber");
+	if(fromNumber) {
+		entryFromNumber.value = fromNumber;
+	}else{
+		entryFromNumber.value = "";
+	}
+
+}
+
+function init_contact(db) {
+	db.readTransaction(function (t) {
+		t.executeSql('SELECT name, number FROM contacts', [], function (t, data) {
+        		for(var i = 0; i < data.rows.length; i++){ 
+				document.getElementById('contacts').innerHTML += "<li>" +  data.rows.item(i).name  + "</li>";
+        		}
+    		});
+	});
+}
+
+function init_contact() {
+	var db = null;
+	document.getElementById('contacts').innerHTML = '';
+	db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
+	db.transaction(function (tx) {
+  		tx.executeSql('CREATE TABLE IF NOT EXISTS contacts (id REAL UNIQUE, name TEXT, number TEXT)');
+		tx.executeSql('SELECT id, name, number FROM contacts', [], function (tx, data) {
+        		for(var i = 0; i < data.rows.length; i++){ 
+				document.getElementById('contacts').innerHTML += "<li>" +  data.rows.item(i).name  + " - " + data.rows.item(i).number + "<a href='javascript:deleteContact(\"" + data.rows.item(i).id + "\")'>[X]</a></li>";
+        		}
+    		});
+	});
+}
+
+function deleteContact(id) {
+	var db = null;
+	db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
+	db.transaction(function (tx) {
+		tx.executeSql("delete from contacts where id='" + id + "'");
+	});
+	init_contact();
+}
+
+function add_contact() {
+	var db = null;
+	document.getElementById('contacts').innerHTML = '';
+	db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
+	db.transaction(function (tx) {
+  		tx.executeSql('CREATE TABLE IF NOT EXISTS contacts (id REAL UNIQUE, name TEXT, number TEXT)');
+		tx.executeSql('INSERT INTO contacts (id, name, number) VALUES (?, ?, ?)', [Math.uuid(15), document.getElementById("contactName").value,  document.getElementById("contactNumber").value]);
+		tx.executeSql('SELECT id, name, number FROM contacts', [], function (tx, data) {
+        		for(var i = 0; i < data.rows.length; i++){ 
+				document.getElementById('contacts').innerHTML += "<li>" +  data.rows.item(i).name  + " - " + data.rows.item(i).number + "<a href='javascript:deleteContact(\"" + data.rows.item(i).id + "\")'>[X]</a></li>";
+        		}
+   	});
+   	});
+}
+
+function init() {
+	restore_options();
+	init_contact();
+}
+
+</script>
+
+<body onload="init();">
+
+<div id="status"></div>
+
+<h3>Param&egrave;tres OVH</h3>
+<table width=500px>
+<tr>
+<td>Num&eacute;ro d'&eacute;metteur</td><td><input type="text" id="fromNumber"><br>Format international ex : 00336XXXXXXXX</td>
+</tr><tr>
+<td>Identifiant pack SMS</td><td><input type="text" id="packSMS"></td>
+</tr><tr>
+<td>Identifiant SoAPI*</td><td><input type="text" id="soapLogin"></td>
+</tr><tr>
+<td>Mot de passe SoAPI*</td><td><input type="password" id="soapPassword"></td>
+</tr>
+</table>
+<br>
+<button onclick="save_options()">Save</button>
+<hr>
+<h3>G&eacute;stion des contacts</h3>
+
+<ul id="contacts"></ul>
+
+Nom <input type="text" id="contactName"/> Tel. <input type="text" id="contactNumber"/> <input type="button" value="Ajouter" onclick="add_contact();"/>
+<br/>
+<br/>
+
+<hr>
+<div>
+<font color="red">*<b>Vos identifiant et mots de passe sont stock&eacute;s sur AUCUN serveur.</b><br> 
+Ils ne font que transiter via HTTPS entre votre navigateur, le serveur https://sms.px.io et https://www.ovh.com/soapi/soapi-re-1.24.wsdl.<br>
+Le serveur sms.px.io ne sert que de proxy SOAP. Il ne stock AUCUN LOGIN NI MOT DE PASSE.</font>
+</div>
+
+</body>
+</html>
