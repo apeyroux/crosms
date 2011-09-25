@@ -1,0 +1,33 @@
+h3 { font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+     font-size: 18pt;
+	 color: #336699;
+     background:#CCCCFF;
+     border: #335599 solid 2;
+     text-align:center;
+}
+
+input {
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    color: #336699;
+    background:#CCCCFF;
+    border: #335599 solid 1;
+}
+
+div {
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    color: #336699;
+}
+
+.alert {
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    font-size: 8pt;
+    color: #FF0033;
+}
+
+.status {
+    font-family: Verdana, Geneva, Arial, Helvetica, sans-serif;
+    font-size:22pt;
+    color: #99CC00;  
+    text-align:center;
+    background:#FFF;
+}
