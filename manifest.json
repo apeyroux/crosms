@@ -1,18 +1,18 @@
 {
   "name": "CroSMS",
-  "options_page": "options.html",
+  "options_page": "html/options.html",
   "version": "2.0.0",
   "description": "Envoyez des SMS via chrome en utilisant votre compte SMS OVH.",
-  "background_page": "bg.html",
-  "icons": { "16": "icon-32.png",
-           "48": "icon-48.png",
-          "128": "icon-128.png" },
+  "background_page": "html/bg.html",
+  "icons": { "16": "img/icon-32.png",
+           "48": "img/icon-48.png",
+          "128": "img/icon-128.png" },
   "permissions": [
     "https://sms.px.io/",
     "notifications"
   ],
   "browser_action": {
-    "default_icon": "icon.png",
-    "popup": "sms.html"
+    "default_icon": "img/icon.png",
+    "popup": "html/sms.html"
   }
 }
