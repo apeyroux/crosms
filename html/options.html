@@ -2,7 +2,9 @@
 
 <head><title>CroSMS Options</title></head>
 <LINK href="../css/options.css" rel="stylesheet" type="text/css">
-<script language="javascript" src="Math.uuid.js"></script>
+<script language="javascript" src="../js/Math.uuid.js"></script>
+<script language="javascript" src="../js/contacts.js"></script>
+
 <script type="text/javascript">
 
 function save_options() {
@@ -67,57 +69,34 @@ function restore_options() {
 
 }
 
-function init_contact(db) {
-	db.readTransaction(function (t) {
-		t.executeSql('SELECT name, number FROM contacts', [], function (t, data) {
-        		for(var i = 0; i < data.rows.length; i++){ 
-				document.getElementById('contacts').innerHTML += "<li>" +  data.rows.item(i).name  + "</li>";
-        		}
-    		});
-	});
+contacts = new Contacts();
+
+function initContacts() {
+    document.getElementById('contacts').innerHTML = null;
+    function cbList(lcontacts)
+    {
+        console.log(lcontacts);
+        for(var i = 0; i < lcontacts.length; i++){ 
+    	    document.getElementById('contacts').innerHTML += "<li>" + lcontacts[i].name + " (" + lcontacts[i].number + ") - <a href='javascript:delContact(\"" +  lcontacts[i].id  + "\")'>[x]</a></li>";
+        }
+    }
+    console.log("init contact");
+    contacts.list(cbList);
 }
 
-function init_contact() {
-	var db = null;
-	document.getElementById('contacts').innerHTML = '';
-	db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
-	db.transaction(function (tx) {
-  		tx.executeSql('CREATE TABLE IF NOT EXISTS contacts (id REAL UNIQUE, name TEXT, number TEXT)');
-		tx.executeSql('SELECT id, name, number FROM contacts', [], function (tx, data) {
-        		for(var i = 0; i < data.rows.length; i++){ 
-				document.getElementById('contacts').innerHTML += "<li>" +  data.rows.item(i).name  + " - " + data.rows.item(i).number + "<a href='javascript:deleteContact(\"" + data.rows.item(i).id + "\")'>[X]</a></li>";
-        		}
-    		});
-	});
+function delContact(id) {
+    contacts.del(id);
+    initContacts();
 }
 
-function deleteContact(id) {
-	var db = null;
-	db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
-	db.transaction(function (tx) {
-		tx.executeSql("delete from contacts where id='" + id + "'");
-	});
-	init_contact();
-}
-
-function add_contact() {
-	var db = null;
-	document.getElementById('contacts').innerHTML = '';
-	db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
-	db.transaction(function (tx) {
-  		tx.executeSql('CREATE TABLE IF NOT EXISTS contacts (id REAL UNIQUE, name TEXT, number TEXT)');
-		tx.executeSql('INSERT INTO contacts (id, name, number) VALUES (?, ?, ?)', [Math.uuid(15), document.getElementById("contactName").value,  document.getElementById("contactNumber").value]);
-		tx.executeSql('SELECT id, name, number FROM contacts', [], function (tx, data) {
-        		for(var i = 0; i < data.rows.length; i++){ 
-				document.getElementById('contacts').innerHTML += "<li>" +  data.rows.item(i).name  + " - " + data.rows.item(i).number + "<a href='javascript:deleteContact(\"" + data.rows.item(i).id + "\")'>[X]</a></li>";
-        		}
-   	});
-   	});
+function addContact(name, number) {
+    contacts.add(name, number);
+    initContacts();
 }
 
 function init() {
 	restore_options();
-	init_contact();
+	initContacts();
 }
 
 </script>
@@ -146,7 +125,7 @@ function init() {
 
 <ul id="contacts"></ul>
 <div>
-Nom <input type="text" id="contactName"/> Tel. <input type="text" id="contactNumber"/> <input type="button" value="Ajouter" onclick="add_contact();"/></div>
+Nom <input type="text" id="contactName"/> Tel. <input type="text" id="contactNumber"/> <input type="button" value="Ajouter" onclick="addContact(document.getElementById('contactName').value, document.getElementById('contactNumber').value);"/></div>
 <br/>
 <br/>
 
