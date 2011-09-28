@@ -1,7 +1,7 @@
 {
   "name": "CroSMS",
   "options_page": "html/options.html",
-  "version": "2.0.2",
+  "version": "2.0.3",
   "description": "Envoyez des SMS via chrome en utilisant votre compte SMS OVH.",
   "background_page": "html/bg.html",
   "icons": { "16": "img/icon-32.png",
