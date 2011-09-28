@@ -10,6 +10,7 @@ textarea {
  background-color:#FFF;
  }
 </STYLE>
+<script language="javascript" src="../js/contacts.js"></script>
 <script language="Javascript">
 
 	function loadForm() {
@@ -36,16 +37,15 @@ textarea {
 	}
 
 	function init_contact() {
-		var db = null;
-		db = openDatabase('db_crosms', '1.0', 'crosms contacts database', 2 * 1024 * 1024);
-		db.transaction(function (tx) {
-  			tx.executeSql('CREATE TABLE IF NOT EXISTS contacts (id REAL UNIQUE, name TEXT, number TEXT)');
-			tx.executeSql('SELECT id, name, number FROM contacts', [], function (tx, data) {
-        			for(var i = 0; i < data.rows.length; i++){ 
-					document.getElementById('contacts').add(new Option(data.rows.item(i).name, data.rows.item(i).number));
-        			}
-    			});
-		});
+		contacts = new Contacts();
+		function cbList(lcontacts)
+		{
+			console.log(lcontacts);
+			for(var i = 0; i < lcontacts.length; i++){ 
+				document.getElementById('contacts').add(new Option(lcontacts[i].name, lcontacts[i].number));
+			}
+		}
+		contacts.list(cbList);
 	}
 </script>
 </head>
